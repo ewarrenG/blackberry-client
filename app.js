@@ -1,64 +1,37 @@
-const express = require('express');
-const app = express();
+'use strict';
+const app = require('express')();
+const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const Company = require('./models/company');
+// const config = require('./config.js');
 
-let mongoDB = 'mongodb+srv://admin:XsQi7D5fqYcXhJy@cluster0-5fkq8.mongodb.net/blackberry';
+const env = process.env.NODE_ENV || 'development';
 
-mongoose.connect(mongoDB, { useNewUrlParser: true });
-mongoose.Promise = global.Promise;
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-// console.log('db', db);
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(bodyParser.json({ limit: '50mb', extended: true }));
 
-function getResults() {
-  // console.log('getResults');
-  let resultsArr = [];
-  db.collection('companies_results_new').find({}, function(err, docs) {
-    if (err) throw err;
-    // console.log('docs', docs);
-    docs.forEach(function(doc, index) {
-      // console.log('doc', doc);
-      resultsArr.push(doc);
-      // console.log('resultsArr', resultsArr);
-    });
-  })
-  return resultsArr;
+// let mongoDB;
+// if ('development' == env || 'staging' == env) {
+//   mongoDB = 'mongodb+srv://admin:XsQi7D5fqYcXhJy@cluster0-5fkq8.mongodb.net/blackberry';
+// } else {
+//   mongoDB =
+//     'mongodb://' +
+//     config.mlab.username +
+//     ':' +
+//     config.mlab.password +
+//     '@ds' +
+//     config.mlab.prodconnection_a +
+//     '.mlab.com:' +
+//     config.mlab.prodconnection_b +
+//     '/' +
+//     config.mlab.dbname;
+// }
 
-  // let promiseArray = [];
-  // promiseArray.push(
-  //   new Promise((resolve, reject) => {
-  //     db.collection('companies_results_new').find({ })
-  //       .then(docs => {
-  //         returnObj[key] = docs || [];
-  //         resolve({ [key]: docs, value: key });
-  //       });
-  //   })
-  // );
+// mongoose.connect(mongoDB, { useNewUrlParser: true });
+// mongoose.Promise = global.Promise;
+// const db = mongoose.connection;
+// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-  
-}
+let routes = require('./routes/index');
+app.use('/', routes);
 
-/*
-
-  for (let key in req.body) {
-    promiseArray.push(
-      new Promise((resolve, reject) => {
-        Scans.find({ date: { $gte: req.body[key].min, $lt: req.body[key].max } })
-          .populate('user_reference')
-          .then(docs => {
-            returnObj[key] = docs || [];
-            resolve({ [key]: docs, value: key });
-          });
-      })
-    );
-  }
-  res.status(200).send(await Promise.all(promiseArray));
-
-*/
-
-const port = 5000;
-
-app.get('/', (req, res) => res.send(getResults()));
-
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(5000);
