@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const Result = new Schema({
+const companies_results_new = new Schema({
   company_name: {
     type: String,
     required: true
@@ -12,4 +12,4 @@ const Result = new Schema({
   }
 });
 
-module.exports = mongoose.model('Result', Result);
+module.exports = mongoose.model('companies_results_new', companies_results_new);
