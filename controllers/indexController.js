@@ -13,43 +13,17 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 module.exports.getResults = (req, res, next) => {
-  console.log('getResults 000');
+  console.log('getResults 0000');
 
   db.collection('companies_results_new')
     .find({})
     .toArray(function(err, docs) {
-      console.log('docs', docs);
+      console.log('docs[0]', docs[0]);
       if (err) {
         console.log('err: ' + err);
       } else {
-        // console.log('docs', docs);
-        if (docs.length) {
-          res.status(200).send(docs);
-        } else {
-          res.status(404).send('"{}"');
-        }
+        res.status(200).send({ results: docs });
       }
     });
-
-  // //works
-  // Admin.find({ email: 'eglasenk+admin@gmail.com' }).exec((err, foundUser) => {
-  //   if (err) {
-  //     console.log('err: ' + err);
-  //   } else {
-  //     //res.send(foundUser);
-  //     console.log('foundUser: ' + foundUser);
-  //   }
-  // });
-
-  //doesn't
-  // Result.find({ companyName: 'Box' }).exec((err, docs) => {
-  //   if (err) {
-  //     console.log('err: ' + err);
-  //   } else {
-  //     console.log('docs: ' + docs);
-  //     // docs.foreEach(doc => {
-  //     //   console.log('doc', doc);
-  //     // });
-  //   }
-  // });
+  // db.close();
 };
