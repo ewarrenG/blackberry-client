@@ -23,7 +23,7 @@ class Chart extends Component {
           options={{
             title: {
               display: this.props.displayTitle,
-              text: 'Largest Cities in ' + this.props.location,
+              text: 'Job Openings Over Time',
               fontSize: 25
             },
             legend: {

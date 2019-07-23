@@ -1,8 +1,10 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import Navbar from './components/Navbar';
 import Dropdown from './components/Dropdown';
 import Chart from './components/Chart';
+import moment from 'moment';
 
 class App extends React.Component {
   constructor(props) {
@@ -67,7 +69,7 @@ class App extends React.Component {
     let dataArr = [];
     if (this.state.result.jobPostings) {
       this.state.result.jobPostings.map(day => {
-        labelArr.push(day.date);
+        labelArr.push(moment(day.date).format('MM-DD-YY'));
         dataArr.push(day.numberOfJobs);
       });
     }
@@ -90,12 +92,21 @@ class App extends React.Component {
   render() {
     return (
       <div className="App">
-        <Dropdown
-          results={this.state.results}
-          handleDropdownChange={this.handleDropdownChange}
-          dropdownValue={this.state.dropdownValue}
-        />
-        <Chart legendPosition="bottom" chartData={this.state.chartData} location="Massachusetts" />
+        <Navbar />
+
+        <div className="home container p-5">
+          <Dropdown
+            results={this.state.results}
+            handleDropdownChange={this.handleDropdownChange}
+            dropdownValue={this.state.dropdownValue}
+          />
+          <Chart
+            legendPosition="bottom"
+            chartData={this.state.chartData}
+            location="Massachusetts"
+            companyName={this.state.result.companyName}
+          />
+        </div>
       </div>
     );
   }

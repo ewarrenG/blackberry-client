@@ -13,12 +13,9 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 module.exports.getResults = (req, res, next) => {
-  console.log('getResults 0000');
-
   db.collection('companies_results_new')
     .find({})
     .toArray(function(err, docs) {
-      console.log('docs[0]', docs[0]);
       if (err) {
         console.log('err: ' + err);
       } else {
