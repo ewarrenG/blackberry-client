@@ -2,7 +2,6 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Dropdown from './components/Dropdown';
-// import Graph from './components/Graph';
 import Chart from './components/Chart';
 
 class App extends React.Component {
@@ -24,48 +23,22 @@ class App extends React.Component {
         'Content-Type': 'application/json'
       }
     });
-    // console.log('response', response);
     let responseData = await response.json();
-    // console.log('responseData', responseData);
-    this.setState({
-      results: responseData.results,
-      dropdownValue: responseData.results[0].companyName,
-      result: responseData.results[0]
-    });
-
+    console.log('responseData', responseData); //how do I get this to chartData format?
+    this.setState(
+      {
+        results: responseData.results,
+        dropdownValue: responseData.results[0].companyName,
+        result: responseData.results[0]
+      },
+      () => {
+        this.getChartData();
+      }
+    );
   }
 
   componentWillMount() {
-    this.getChartData()
-  }
-
-  getChartData() {
-    this.setState({
-      chartData: {
-        labels: ['Boston1', 'Worcester', 'Springfield', 'Lowell', 'Cambridge', 'New Bedford'],
-        datasets: [{
-          label: 'Population',
-          data: [
-            617594,
-            181045,
-            153060,
-            106519,
-            105162,
-            95072
-          ],
-          //backgroundColor:'green',
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.6)',
-            'rgba(54, 162, 235, 0.6)',
-            'rgba(255, 206, 86, 0.6)',
-            'rgba(75, 192, 192, 0.6)',
-            'rgba(153, 102, 255, 0.6)',
-            'rgba(255, 159, 64, 0.6)',
-            'rgba(255, 99, 132, 0.6)'
-          ]
-        }]
-      }
-    })
+    this.getChartData();
   }
 
   //settings
@@ -75,17 +48,46 @@ class App extends React.Component {
     });
     this.state.results.map(result => {
       if (result.companyName === event.target.value) {
-        this.setState({
-          result: result
-        });
+        this.setState(
+          {
+            result: result
+          },
+          () => {
+            this.getChartData();
+          }
+        );
       }
     });
   };
 
+  getChartData() {
+    // let labelArr = this.state.result.jobPostings.map(item => item.date);
+    // console.log('labelArr', labelArr);
+    let labelArr = [];
+    let dataArr = [];
+    if (this.state.result.jobPostings) {
+      this.state.result.jobPostings.map(day => {
+        labelArr.push(day.date);
+        dataArr.push(day.numberOfJobs);
+      });
+    }
+
+    this.setState(
+      prevState => ({
+        chartData: {
+          ...prevState.chartData,
+          labels: labelArr,
+          datasets: [{ ...prevState.chartData.dataSets, label: 'Openings', data: dataArr }]
+        }
+      }),
+      () => {
+        console.log('callback after setting state');
+        console.log('this.state.chartData', this.state.chartData);
+      }
+    );
+  }
+
   render() {
-    console.log('this.state.results', this.state.results);
-    console.log('this.state.result', this.state.result);
-    console.log('this.state.result.jobPostings', this.state.result.jobPostings);
     return (
       <div className="App">
         <Dropdown
@@ -93,9 +95,7 @@ class App extends React.Component {
           handleDropdownChange={this.handleDropdownChange}
           dropdownValue={this.state.dropdownValue}
         />
-        {/* <Graph result={this.state.result} /> */}
         <Chart legendPosition="bottom" chartData={this.state.chartData} location="Massachusetts" />
-        {/* <Chart legendPosition="top" chartData={this.state.chartData} location="New York" /> */}
       </div>
     );
   }
