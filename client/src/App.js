@@ -18,7 +18,8 @@ class App extends React.Component {
   }
 
   async componentDidMount() {
-    let response = await fetch('/results', {
+    //let response = await fetch('/results', {
+    let response = await fetch('https://blackberry-client.herokuapp.com/results/', {
       method: 'GET',
       headers: {
         Accept: 'application/json',
