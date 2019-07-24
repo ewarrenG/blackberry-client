@@ -1,8 +1,10 @@
 'use strict';
-const app = require('express')();
+const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-// const config = require('./config.js');
+const path = require('path');
+
+const app = express();
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -31,7 +33,16 @@ app.use(bodyParser.json({ limit: '50mb', extended: true }));
 // const db = mongoose.connection;
 // db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
+//  Serve static files from the React app
+app.use(express.static(path.join(__dirname, 'client/build')));
+
 let routes = require('./routes/index');
 app.use('/', routes);
+
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '/client/build/index.html'));
+  });
+}
 
 app.listen(5000);
