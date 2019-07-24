@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 
 const app = express();
+const port = process.env.PORT || 5000;
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -45,4 +46,4 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(5000);
+app.listen(port);
