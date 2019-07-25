@@ -27,6 +27,9 @@ class App extends React.Component {
     });
     let responseData = await response.json();
     console.log('responseData', responseData); //how do I get this to chartData format?
+
+    responseData.results.sort(this.compareValues('companyName'));
+
     this.setState(
       {
         results: responseData.results,
@@ -83,10 +86,30 @@ class App extends React.Component {
         }
       }),
       () => {
-        console.log('callback after setting state');
-        console.log('this.state.chartData', this.state.chartData);
+        // console.log('callback after setting state');
+        // console.log('this.state.chartData', this.state.chartData);
       }
     );
+  }
+
+  compareValues(key, order = 'asc') {
+    console.log('compareValues');
+    return function(a, b) {
+      if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
+        return 0;
+      }
+
+      const varA = typeof a[key] === 'string' ? a[key].toUpperCase() : a[key];
+      const varB = typeof b[key] === 'string' ? b[key].toUpperCase() : b[key];
+
+      let comparison = 0;
+      if (varA > varB) {
+        comparison = 1;
+      } else if (varA < varB) {
+        comparison = -1;
+      }
+      return order === 'desc' ? comparison * -1 : comparison;
+    };
   }
 
   render() {
