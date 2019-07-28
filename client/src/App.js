@@ -11,9 +11,11 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      results: [],
-      dropdownValue: '',
-      result: {},
+      resultsArr: [],
+      masterArr: [],
+      companyNameDropdownValue: '',
+      industryDropdownValue: '',
+      selectedOption: [],//{},
       chartData: {},
       // inputValue: ''
     };
@@ -31,17 +33,19 @@ class App extends React.Component {
       }
     });
     let responseData = await response.json();
-    console.log('responseData', responseData); //how do I get this to chartData format?
-
+    console.log('responseData', responseData);
     responseData.results.sort(this.compareValues('companyName'));
 
     this.setState(
       {
-        results: responseData.results,
-        dropdownValue: responseData.results[0].companyName,
-        result: responseData.results[0]
+        resultsArr: responseData.results,
+        masterArr: responseData.master,
+        companyNameDropdownValue: responseData.results[0].companyName,
+        industryDropdownValue: responseData.master[0].industry,
+        selectedOption: [responseData.results[0]]
       },
       () => {
+        console.log('this.state.selectedOption', this.state.selectedOption)
         this.getChartData();
       }
     );
@@ -53,21 +57,44 @@ class App extends React.Component {
 
   //settings
   handleDropdownChange = event => {
+    console.log('handleDropdownChange')
+    // console.log(event.target);
+    let targetVal = event.target.value;
+    let key = event.target.dataset.key.replace(/_([a-z])/g, function (g) { return g[1].toUpperCase(); })
+    let stateToChange = key + 'DropdownValue';
+    let companyArrMatchingIndustry = [];
+    // console.log('stateToChange', stateToChange)
     this.setState({
-      dropdownValue: event.target.value
-    });
-    this.state.results.map(result => {
-      if (result.companyName === event.target.value) {
-        this.setState(
-          {
-            result: result
-          },
-          () => {
-            this.getChartData();
+      [stateToChange]: event.target.value,
+      selectedOption: []
+    },
+      () => {
+        if (key === 'industry') {
+          this.state.masterArr.map(masterItem => {
+            if (masterItem[key] === this.state[stateToChange]) {
+              companyArrMatchingIndustry.push(masterItem.company_name)
+            }
+          })
+        } else {
+          this.state.masterArr.map(masterItem => {
+            if (masterItem['company_name'] === targetVal) {
+              companyArrMatchingIndustry.push(masterItem.company_name)
+            }
+          })
+        }
+        console.log('companyArrMatchingIndustry', companyArrMatchingIndustry)
+
+        this.state.resultsArr.map(result => {
+          if (companyArrMatchingIndustry.indexOf(result.companyName) > -1) {
+            this.setState(prevState => ({
+              selectedOption: [...prevState.selectedOption, result]
+            }), () => {
+              console.log('inside callback????')
+              this.getChartData()
+            })
           }
-        );
-      }
-    });
+        })
+      });
   };
 
   handleMatchingSearch(searchTerm, matchingResult) {
@@ -77,7 +104,7 @@ class App extends React.Component {
 
     this.setState(
       {
-        result: matchingResult
+        selectedOption: matchingResult
       },
       () => {
         this.getChartData();
@@ -86,27 +113,37 @@ class App extends React.Component {
   }
 
   getChartData() {
-    // console.log('getChartData')
-    // let labelArr = this.state.result.jobPostings.map(item => item.date);
-    // console.log('labelArr', labelArr);
+    console.log('getChartData')
+    console.log('this.state.selectedOption', this.state.selectedOption)
     let labelArr = [];
     let dataArr = [];
-    if (this.state.result.jobPostings) {
-      this.state.result.jobPostings.map(day => {
-        labelArr.push(moment(day.date).format('MM-DD-YY'));
-        dataArr.push(day.numberOfJobs);
+    for (let i = 0; i < this.state.selectedOption.length; i++) {
+      let thisCompaniesData = {};
+      let thisCompaniesPostingsArray = []
+      this.state.selectedOption[i].jobPostings.map(day => {
+        if (i === 0) {
+          labelArr.push(moment(day.date).format('MM-DD-YY'));
+        }
+        thisCompaniesPostingsArray.push(day.numberOfJobs);
       });
+      thisCompaniesData.data = thisCompaniesPostingsArray;
+      thisCompaniesData.label = this.state.selectedOption[i].companyName;
+      dataArr.push(thisCompaniesData);
     }
+
+    console.log('labelArr', labelArr)
+    console.log('dataArr', dataArr)
 
     this.setState(
       prevState => ({
         chartData: {
           ...prevState.chartData,
           labels: labelArr,
-          datasets: [{ ...prevState.chartData.dataSets, label: 'Openings', data: dataArr }]
+          datasets: dataArr, //[{ ...prevState.chartData.dataSets, data: dataArr }]
         }
       }),
       () => {
+        console.log('this.state.chartData', this.state.chartData)
         // console.log('callback after setting state');
         // console.log('this.state.chartData', this.state.chartData);
       }
@@ -138,17 +175,29 @@ class App extends React.Component {
         <Navbar />
 
         <div className="home container p-5">
-          <Dropdown
-            results={this.state.results}
-            handleDropdownChange={this.handleDropdownChange}
-            dropdownValue={this.state.dropdownValue}
-          />
+
+          <div className="row pt-5">
+            <Dropdown
+              options={this.state.masterArr}
+              for="company_name"
+              handleDropdownChange={this.handleDropdownChange}
+              value={this.state.companyNameDropdownValue}
+              title="Filter by Company Name"
+            />
+            <Dropdown
+              options={this.state.masterArr}
+              for="industry"
+              handleDropdownChange={this.handleDropdownChange}
+              value={this.state.industryDropdownValue}
+              title="Filter by Industry"
+            />
+          </div>
           {/* <Searchbar inputValue='' results={this.state.results} handleMatchingSearch={this.handleMatchingSearch} /> */}
           <Chart
             legendPosition="bottom"
             chartData={this.state.chartData}
             location="Massachusetts"
-            companyName={this.state.result.companyName}
+            companyName={this.state.selectedOption.companyName}
           />
         </div>
       </div>

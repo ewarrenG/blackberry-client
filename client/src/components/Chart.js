@@ -16,6 +16,7 @@ class Chart extends Component {
   };
 
   render() {
+    console.log('this.props.chartData', this.props.chartData)
     return (
       <div className="chart">
         <Line
@@ -26,10 +27,10 @@ class Chart extends Component {
               text: 'Job Openings Over Time',
               fontSize: 25
             },
-            legend: {
+            /*legend: {
               display: this.props.displayLegend,
               position: this.props.legendPosition
-            }
+            }*/
           }}
         />
       </div>
