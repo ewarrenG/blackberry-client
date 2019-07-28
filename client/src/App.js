@@ -71,9 +71,9 @@ class App extends React.Component {
   };
 
   handleMatchingSearch(searchTerm, matchingResult) {
-    console.log('handleMatchingSearch')
+    //console.log('handleMatchingSearch')
     // console.log('searchTerm', searchTerm)
-    console.log('matchingResult', matchingResult)
+    //console.log('matchingResult', matchingResult)
 
     this.setState(
       {
@@ -86,7 +86,7 @@ class App extends React.Component {
   }
 
   getChartData() {
-    console.log('getChartData')
+    // console.log('getChartData')
     // let labelArr = this.state.result.jobPostings.map(item => item.date);
     // console.log('labelArr', labelArr);
     let labelArr = [];
