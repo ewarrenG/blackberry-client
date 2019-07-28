@@ -138,12 +138,12 @@ class App extends React.Component {
         <Navbar />
 
         <div className="home container p-5">
-          {/* <Dropdown
+          <Dropdown
             results={this.state.results}
             handleDropdownChange={this.handleDropdownChange}
             dropdownValue={this.state.dropdownValue}
-          /> */}
-          <Searchbar inputValue='' results={this.state.results} handleMatchingSearch={this.handleMatchingSearch} />
+          />
+          {/* <Searchbar inputValue='' results={this.state.results} handleMatchingSearch={this.handleMatchingSearch} /> */}
           <Chart
             legendPosition="bottom"
             chartData={this.state.chartData}
