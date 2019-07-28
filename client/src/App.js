@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import Navbar from './components/Navbar';
 import Dropdown from './components/Dropdown';
+import Searchbar from './components/Searchbar';
 import Chart from './components/Chart';
 import moment from 'moment';
 
@@ -13,8 +14,12 @@ class App extends React.Component {
       results: [],
       dropdownValue: '',
       result: {},
-      chartData: {}
+      chartData: {},
+      // inputValue: ''
     };
+
+    this.handleMatchingSearch = this.handleMatchingSearch.bind(this);
+
   }
 
   async componentDidMount() {
@@ -65,7 +70,23 @@ class App extends React.Component {
     });
   };
 
+  handleMatchingSearch(searchTerm, matchingResult) {
+    console.log('handleMatchingSearch')
+    // console.log('searchTerm', searchTerm)
+    console.log('matchingResult', matchingResult)
+
+    this.setState(
+      {
+        result: matchingResult
+      },
+      () => {
+        this.getChartData();
+      }
+    );
+  }
+
   getChartData() {
+    console.log('getChartData')
     // let labelArr = this.state.result.jobPostings.map(item => item.date);
     // console.log('labelArr', labelArr);
     let labelArr = [];
@@ -93,8 +114,7 @@ class App extends React.Component {
   }
 
   compareValues(key, order = 'asc') {
-    console.log('compareValues');
-    return function(a, b) {
+    return function (a, b) {
       if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
         return 0;
       }
@@ -118,11 +138,12 @@ class App extends React.Component {
         <Navbar />
 
         <div className="home container p-5">
-          <Dropdown
+          {/* <Dropdown
             results={this.state.results}
             handleDropdownChange={this.handleDropdownChange}
             dropdownValue={this.state.dropdownValue}
-          />
+          /> */}
+          <Searchbar inputValue='' results={this.state.results} handleMatchingSearch={this.handleMatchingSearch} />
           <Chart
             legendPosition="bottom"
             chartData={this.state.chartData}

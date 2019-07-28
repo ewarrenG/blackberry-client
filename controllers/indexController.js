@@ -15,12 +15,20 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 module.exports.getResults = (req, res, next) => {
   db.collection('companies_results_new')
     .find({})
-    .toArray(function(err, docs) {
+    .toArray(function (err, resultsDocs) {
       if (err) {
         console.log('err: ' + err);
       } else {
-        res.status(200).send({ results: docs });
+        db.collection('companies_master_industry')
+          .find({})
+          .toArray(function (err, masterDocs) {
+            res.status(200).send({ master: masterDocs, results: resultsDocs });
+          })
       }
     });
-  // db.close();
+};
+
+module.exports.copyCollection = (req, res, next) => {
+  console.log('copyCollection')
+  db.collection('companies_results_new').copyTo('companies_master_industry') //doesn't work :O
 };
