@@ -7,7 +7,7 @@ function Navbar(props) {
         <ul className="nav nav-pills mr-auto">
           <li className="nav-item">
             {/* <img src={Config.client.logo_url} style={{ maxHeight: '40px' }} /> */}
-            Project Blackerry
+            Project Blackberry
           </li>
           {/* <li className="nav-item">
             <a
