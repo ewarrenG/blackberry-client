@@ -15,13 +15,12 @@ class App extends React.Component {
       masterArr: [],
       companyNameDropdownValue: '',
       industryDropdownValue: '',
-      selectedOption: [],//{},
-      chartData: {},
+      selectedOption: [], //{},
+      chartData: {}
       // inputValue: ''
     };
 
     this.handleMatchingSearch = this.handleMatchingSearch.bind(this);
-
   }
 
   async componentDidMount() {
@@ -45,7 +44,7 @@ class App extends React.Component {
         selectedOption: [responseData.results[0]]
       },
       () => {
-        console.log('this.state.selectedOption', this.state.selectedOption)
+        console.log('this.state.selectedOption', this.state.selectedOption);
         this.getChartData();
       }
     );
@@ -57,44 +56,51 @@ class App extends React.Component {
 
   //settings
   handleDropdownChange = event => {
-    console.log('handleDropdownChange')
+    console.log('handleDropdownChange');
     // console.log(event.target);
     let targetVal = event.target.value;
-    let key = event.target.dataset.key.replace(/_([a-z])/g, function (g) { return g[1].toUpperCase(); })
+    let key = event.target.dataset.key.replace(/_([a-z])/g, function(g) {
+      return g[1].toUpperCase();
+    });
     let stateToChange = key + 'DropdownValue';
     let companyArrMatchingIndustry = [];
     // console.log('stateToChange', stateToChange)
-    this.setState({
-      [stateToChange]: event.target.value,
-      selectedOption: []
-    },
+    this.setState(
+      {
+        [stateToChange]: event.target.value,
+        selectedOption: []
+      },
       () => {
         if (key === 'industry') {
           this.state.masterArr.map(masterItem => {
             if (masterItem[key] === this.state[stateToChange]) {
-              companyArrMatchingIndustry.push(masterItem.company_name)
+              companyArrMatchingIndustry.push(masterItem.company_name);
             }
-          })
+          });
         } else {
           this.state.masterArr.map(masterItem => {
             if (masterItem['company_name'] === targetVal) {
-              companyArrMatchingIndustry.push(masterItem.company_name)
+              companyArrMatchingIndustry.push(masterItem.company_name);
             }
-          })
+          });
         }
-        console.log('companyArrMatchingIndustry', companyArrMatchingIndustry)
+        console.log('companyArrMatchingIndustry', companyArrMatchingIndustry);
 
         this.state.resultsArr.map(result => {
           if (companyArrMatchingIndustry.indexOf(result.companyName) > -1) {
-            this.setState(prevState => ({
-              selectedOption: [...prevState.selectedOption, result]
-            }), () => {
-              console.log('inside callback????')
-              this.getChartData()
-            })
+            this.setState(
+              prevState => ({
+                selectedOption: [...prevState.selectedOption, result]
+              }),
+              () => {
+                console.log('inside callback????');
+                this.getChartData();
+              }
+            );
           }
-        })
-      });
+        });
+      }
+    );
   };
 
   handleMatchingSearch(searchTerm, matchingResult) {
@@ -113,13 +119,13 @@ class App extends React.Component {
   }
 
   getChartData() {
-    console.log('getChartData')
-    console.log('this.state.selectedOption', this.state.selectedOption)
+    console.log('getChartData');
+    console.log('this.state.selectedOption', this.state.selectedOption);
     let labelArr = [];
     let dataArr = [];
     for (let i = 0; i < this.state.selectedOption.length; i++) {
       let thisCompaniesData = {};
-      let thisCompaniesPostingsArray = []
+      let thisCompaniesPostingsArray = [];
       this.state.selectedOption[i].jobPostings.map(day => {
         if (i === 0) {
           labelArr.push(moment(day.date).format('MM-DD-YY'));
@@ -131,19 +137,19 @@ class App extends React.Component {
       dataArr.push(thisCompaniesData);
     }
 
-    console.log('labelArr', labelArr)
-    console.log('dataArr', dataArr)
+    console.log('labelArr', labelArr);
+    console.log('dataArr', dataArr);
 
     this.setState(
       prevState => ({
         chartData: {
           ...prevState.chartData,
           labels: labelArr,
-          datasets: dataArr, //[{ ...prevState.chartData.dataSets, data: dataArr }]
+          datasets: dataArr //[{ ...prevState.chartData.dataSets, data: dataArr }]
         }
       }),
       () => {
-        console.log('this.state.chartData', this.state.chartData)
+        console.log('this.state.chartData', this.state.chartData);
         // console.log('callback after setting state');
         // console.log('this.state.chartData', this.state.chartData);
       }
@@ -151,7 +157,7 @@ class App extends React.Component {
   }
 
   compareValues(key, order = 'asc') {
-    return function (a, b) {
+    return function(a, b) {
       if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
         return 0;
       }
@@ -175,8 +181,8 @@ class App extends React.Component {
         <Navbar />
 
         <div className="home container p-5">
-
           <div className="row pt-5">
+            <div className="col-sm-2" />
             <Dropdown
               options={this.state.masterArr}
               for="company_name"
