@@ -12,23 +12,14 @@ mongoose.Promise = global.Promise;
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-module.exports.getResults = (req, res, next) => {
-  db.collection('companies_results_new')
+module.exports.getCompanies = (req, res, next) => {
+  db.collection('companies')
     .find({})
-    .toArray(function (err, resultsDocs) {
+    .toArray(function(err, companiesDocs) {
       if (err) {
         console.log('err: ' + err);
       } else {
-        db.collection('companies_master_industry')
-          .find({})
-          .toArray(function (err, masterDocs) {
-            res.status(200).send({ master: masterDocs, results: resultsDocs });
-          })
+        res.status(200).send({ companies: companiesDocs });
       }
     });
-};
-
-module.exports.copyCollection = (req, res, next) => {
-  console.log('copyCollection')
-  db.collection('companies_results_new').copyTo('companies_master_industry') //doesn't work :O
 };

@@ -3,9 +3,9 @@ import React from 'react';
 class Dropdown extends React.Component {
   render() {
     // console.log('this.props.options', this.props.options)
-    console.log('this.props', this.props)
+    // console.log('this.props', this.props);
     let propToAccess = this.props.for;
-    console.log('propToAccess', propToAccess)
+    // console.log('propToAccess', propToAccess);
     return (
       <div className="col-sm-4">
         <div className="form-group" key="dropdown">
@@ -20,11 +20,18 @@ class Dropdown extends React.Component {
               value={this.props.value}
               data-key={propToAccess}
             >
-              {this.props.options.map((option, index) => (
-                <option key={option[propToAccess].replace(' ', '_') + index} value={option[propToAccess]}>
-                  {option[propToAccess]}
-                </option>
-              ))}
+              {this.props.options.map((option, index) =>
+                option[propToAccess].length ? (
+                  <option
+                    key={option[propToAccess].replace(' ', '_') + index}
+                    value={option[propToAccess]}
+                  >
+                    {option[propToAccess]}
+                  </option>
+                ) : (
+                  ''
+                )
+              )}
             </select>
           </div>
         </div>
