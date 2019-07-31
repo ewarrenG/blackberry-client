@@ -19,7 +19,13 @@ module.exports.getCompanies = (req, res, next) => {
       if (err) {
         console.log('err: ' + err);
       } else {
-        res.status(200).send({ companies: companiesDocs });
+        res
+          .status(200)
+          .send(
+            req.params.company_name
+              ? { companies: companiesDocs, company_param: req.params.company_name }
+              : { companies: companiesDocs }
+          );
       }
     });
 };

@@ -21,7 +21,10 @@ class App extends React.Component {
   }
 
   async componentDidMount() {
-    let response = await fetch('/companies', {
+    let urlVars = getUrlVars();
+    let urlToUse = '/companies';
+    if (urlVars.company_name) urlToUse += '/' + urlVars.company_name;
+    let response = await fetch(urlToUse, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -30,14 +33,22 @@ class App extends React.Component {
     });
     let responseData = await response.json();
     responseData.companies.sort(this.compareValues('company_name'));
-    // responseData.companies.sort(this.compareValues('industry'));
-
+    let companyNameDropdownValue = responseData.companies[0].company_name;
+    let selectedOption = [responseData.companies[0]];
+    if (responseData.company_param) {
+      responseData.companies.map(company => {
+        if (company.company_name === responseData.company_param) {
+          companyNameDropdownValue = company.company_name;
+          selectedOption = [company];
+        }
+      });
+    }
     this.setState(
       {
         companiesArr: responseData.companies,
-        companyNameDropdownValue: responseData.companies[0].company_name,
+        companyNameDropdownValue: companyNameDropdownValue,
         industryDropdownValue: responseData.companies[0].industry,
-        selectedOption: [responseData.companies[0]]
+        selectedOption: selectedOption
       },
       () => {
         this.getChartData();
@@ -76,6 +87,7 @@ class App extends React.Component {
             }
           }
         });
+        // console.log('companyArrForChart', companyArrForChart);
         this.setState(
           {
             selectedOption: companyArrForChart
@@ -105,6 +117,8 @@ class App extends React.Component {
         });
         thisCompaniesData.data = thisCompaniesPostingsArray;
         thisCompaniesData.label = this.state.selectedOption[i].company_name;
+        thisCompaniesData.backgroundColor = getRandomColor();
+        thisCompaniesData.fill = false;
         dataArr.push(thisCompaniesData);
       }
     }
@@ -118,7 +132,8 @@ class App extends React.Component {
         }
       }),
       () => {
-        // console.log("getChartData callback")
+        // console.log('getChartData callback');
+        // console.log('this.state.chartData', this.state.chartData);
       }
     );
   }
@@ -174,6 +189,23 @@ class App extends React.Component {
       </div>
     );
   }
+}
+
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
+function getUrlVars() {
+  var vars = {};
+  var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+    vars[key] = value;
+  });
+  return vars;
 }
 
 export default App;
