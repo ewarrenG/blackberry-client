@@ -101,7 +101,7 @@ class App extends React.Component {
           if (i === 0) {
             labelArr.push(moment(day.date).format('MM-DD-YY'));
           }
-          thisCompaniesPostingsArray.push(day.numberOfJobs); //this needs to change
+          thisCompaniesPostingsArray.push(day.number_of_jobs);
         });
         thisCompaniesData.data = thisCompaniesPostingsArray;
         thisCompaniesData.label = this.state.selectedOption[i].company_name;
