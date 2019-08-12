@@ -32,6 +32,9 @@ class App extends React.Component {
       }
     });
     let responseData = await response.json();
+    console.log(
+      'responseData', responseData
+    )
     responseData.companies.sort(this.compareValues('company_name'));
     let companyNameDropdownValue = responseData.companies[0].company_name;
     let selectedOption = [responseData.companies[0]];
