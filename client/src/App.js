@@ -32,9 +32,6 @@ class App extends React.Component {
       }
     });
     let responseData = await response.json();
-    console.log(
-      'responseData', responseData
-    )
     responseData.companies.sort(this.compareValues('company_name'));
     let companyNameDropdownValue = responseData.companies[0].company_name;
     let selectedOption = [responseData.companies[0]];
@@ -46,23 +43,23 @@ class App extends React.Component {
         }
       });
     }
+
+    //begin stock info request
+    let selectedOptionWithStock = await retrieveStockInfoForCompany(selectedOption);
+
     this.setState(
       {
         companiesArr: responseData.companies,
         companyNameDropdownValue: companyNameDropdownValue,
         industryDropdownValue: responseData.companies[0].industry,
-        selectedOption: selectedOption
+        selectedOption: selectedOptionWithStock
       },
-      () => {
+      async () => {
+        console.log('this.state.selectedOption', this.state.selectedOption);
         this.getChartData();
       }
     );
   }
-
-  //not sure this is necessary
-  // componentWillMount() {
-  //   // this.getChartData();
-  // }
 
   handleDropdownChange = event => {
     // console.log('handleDropdownChange');
@@ -72,28 +69,31 @@ class App extends React.Component {
       return g[1].toUpperCase();
     });
     let stateToChange = key + 'DropdownValue';
-    let companyArrForChart = [];
+    let selectedOption = [];
     this.setState(
       {
         [stateToChange]: event.target.value,
         selectedOption: []
       },
-      () => {
+      async () => {
         this.state.companiesArr.map(company => {
           if (key === 'industry') {
             if (company[key] === this.state[stateToChange]) {
-              companyArrForChart.push(company);
+              selectedOption.push(company);
             }
           } else {
             if (company['company_name'] === targetVal) {
-              companyArrForChart.push(company);
+              selectedOption.push(company);
             }
           }
         });
-        // console.log('companyArrForChart', companyArrForChart);
+
+        //begin stock info request
+        let selectedOptionWithStock = await retrieveStockInfoForCompany(selectedOption);
+
         this.setState(
           {
-            selectedOption: companyArrForChart
+            selectedOption: selectedOptionWithStock
           },
           () => {
             this.getChartData();
@@ -109,20 +109,36 @@ class App extends React.Component {
     let labelArr = [];
     let dataArr = [];
     for (let i = 0; i < this.state.selectedOption.length; i++) {
-      let thisCompaniesData = {};
+      // let thisCompaniesData = {};
+      let thisCompaniesPostingsData = {};
+      let thisCompaniesStockData = {};
       let thisCompaniesPostingsArray = [];
+      let thisCompaniesStockArray = [];
+      let mostRecentValidStockPrice;
       if (this.state.selectedOption[i].postings) {
         this.state.selectedOption[i].postings.map(day => {
           if (i === 0) {
             labelArr.push(moment(day.date).format('MM-DD-YY'));
           }
           thisCompaniesPostingsArray.push(day.number_of_jobs);
+
+          if (day.stock_info) {
+            mostRecentValidStockPrice = day.stock_info.open;
+          }
+
+          thisCompaniesStockArray.push(mostRecentValidStockPrice);
         });
-        thisCompaniesData.data = thisCompaniesPostingsArray;
-        thisCompaniesData.label = this.state.selectedOption[i].company_name;
-        thisCompaniesData.backgroundColor = getRandomColor();
-        thisCompaniesData.fill = false;
-        dataArr.push(thisCompaniesData);
+        thisCompaniesPostingsData.data = thisCompaniesPostingsArray;
+        thisCompaniesPostingsData.label = 'Job Openings'; //this.state.selectedOption[i].company_name +
+        thisCompaniesPostingsData.backgroundColor = getRandomColor();
+        thisCompaniesPostingsData.fill = false;
+        dataArr.push(thisCompaniesPostingsData);
+
+        thisCompaniesStockData.data = thisCompaniesStockArray;
+        thisCompaniesStockData.label = 'Stock Price'; // this.state.selectedOption[i].company_name +
+        thisCompaniesStockData.backgroundColor = getRandomColor();
+        thisCompaniesStockData.fill = false;
+        dataArr.push(thisCompaniesStockData);
       }
     }
 
@@ -161,12 +177,16 @@ class App extends React.Component {
   }
 
   render() {
+    let companyName;
+    this.state.selectedOption[0]
+      ? (companyName = this.state.selectedOption[0].company_name)
+      : (companyName = 'Awaiting...');
     return (
       <div className="App">
         <Navbar />
         <div className="home container p-5">
           <div className="row pt-5">
-            <div className="col-sm-2" />
+            <div className="col-sm-4" />
             <Dropdown
               options={this.state.companiesArr}
               for="company_name"
@@ -174,19 +194,20 @@ class App extends React.Component {
               value={this.state.companyNameDropdownValue}
               title="Filter by Company Name"
             />
-            <Dropdown
+            {/* comment out industry for now */}
+            {/* <Dropdown
               options={this.state.companiesArr}
               for="industry"
               handleDropdownChange={this.handleDropdownChange}
               value={this.state.industryDropdownValue}
               title="Filter by Industry"
-            />
+            /> */}
           </div>
           <Chart
             legendPosition="bottom"
             chartData={this.state.chartData}
             location="Massachusetts"
-            companyName={this.state.selectedOption.company_name}
+            companyName={companyName}
           />
         </div>
       </div>
@@ -209,6 +230,30 @@ function getUrlVars() {
     vars[key] = value;
   });
   return vars;
+}
+
+async function retrieveStockInfoForCompany(selectedOption) {
+  let urlToUseForStock = '/stock/' + selectedOption[0].ticker;
+  let dates = selectedOption[0].postings;
+  let datesObj = { postings: dates };
+  let stockResponse = await fetch(urlToUseForStock, {
+    method: 'post',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(datesObj)
+  });
+
+  let responseStockData = await stockResponse.json();
+  selectedOption[0].postings.forEach(day => {
+    let formattedDate = moment(day.date).format('YYYY-MM-DD');
+    if (responseStockData[formattedDate]) {
+      day.stock_info = responseStockData[formattedDate];
+    }
+  });
+  return selectedOption;
+  //end stock
 }
 
 export default App;
