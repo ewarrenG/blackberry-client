@@ -25,6 +25,24 @@ class Chart extends Component {
               display: this.props.displayTitle,
               text: this.props.companyName,
               fontSize: 25
+            },
+            scales: {
+              yAxes: [
+                {
+                  id: 'postings',
+                  type: 'linear',
+                  position: 'left'
+                },
+                {
+                  id: 'stock',
+                  type: 'linear',
+                  position: 'right'
+                  // ticks: {
+                  //   max: 1,
+                  //   min: 0
+                  // }
+                }
+              ]
             }
             /*legend: {
               display: this.props.displayLegend,

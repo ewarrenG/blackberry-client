@@ -132,12 +132,14 @@ class App extends React.Component {
         thisCompaniesPostingsData.label = 'Job Openings'; //this.state.selectedOption[i].company_name +
         thisCompaniesPostingsData.backgroundColor = getRandomColor();
         thisCompaniesPostingsData.fill = false;
+        thisCompaniesPostingsData.yAxisID = 'postings';
         dataArr.push(thisCompaniesPostingsData);
 
         thisCompaniesStockData.data = thisCompaniesStockArray;
         thisCompaniesStockData.label = 'Stock Price'; // this.state.selectedOption[i].company_name +
         thisCompaniesStockData.backgroundColor = getRandomColor();
         thisCompaniesStockData.fill = false;
+        thisCompaniesStockData.yAxisID = 'stock';
         dataArr.push(thisCompaniesStockData);
       }
     }
@@ -203,12 +205,14 @@ class App extends React.Component {
               title="Filter by Industry"
             /> */}
           </div>
+          {/* <div className="row pt-5"> */}
           <Chart
             legendPosition="bottom"
             chartData={this.state.chartData}
             location="Massachusetts"
             companyName={companyName}
           />
+          {/* </div> */}
         </div>
       </div>
     );
