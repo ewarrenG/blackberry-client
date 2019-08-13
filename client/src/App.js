@@ -3,10 +3,9 @@ import logo from './logo.svg';
 import './App.css';
 import Navbar from './components/Navbar';
 import Dropdown from './components/Dropdown';
-import Searchbar from './components/Searchbar';
+// import Searchbar from './components/Searchbar';
 import Chart from './components/Chart';
 import moment from 'moment';
-import { cpus } from 'os';
 
 class App extends React.Component {
   constructor(props) {
@@ -55,7 +54,6 @@ class App extends React.Component {
         selectedOption: selectedOptionWithStock
       },
       async () => {
-        console.log('this.state.selectedOption', this.state.selectedOption);
         this.getChartData();
       }
     );
@@ -65,7 +63,7 @@ class App extends React.Component {
     // console.log('handleDropdownChange');
     // console.log(event.target);
     let targetVal = event.target.value;
-    let key = event.target.dataset.key.replace(/_([a-z])/g, function(g) {
+    let key = event.target.dataset.key.replace(/_([a-z])/g, function (g) {
       return g[1].toUpperCase();
     });
     let stateToChange = key + 'DropdownValue';
@@ -104,8 +102,6 @@ class App extends React.Component {
   };
 
   getChartData() {
-    // console.log('getChartData');
-    // console.log('this.state.selectedOption', this.state.selectedOption);
     let labelArr = [];
     let dataArr = [];
     for (let i = 0; i < this.state.selectedOption.length; i++) {
@@ -129,14 +125,14 @@ class App extends React.Component {
           thisCompaniesStockArray.push(mostRecentValidStockPrice);
         });
         thisCompaniesPostingsData.data = thisCompaniesPostingsArray;
-        thisCompaniesPostingsData.label = 'Job Openings'; //this.state.selectedOption[i].company_name +
+        thisCompaniesPostingsData.label = 'Job Openings';
         thisCompaniesPostingsData.backgroundColor = getRandomColor();
         thisCompaniesPostingsData.fill = false;
         thisCompaniesPostingsData.yAxisID = 'postings';
         dataArr.push(thisCompaniesPostingsData);
 
         thisCompaniesStockData.data = thisCompaniesStockArray;
-        thisCompaniesStockData.label = 'Stock Price'; // this.state.selectedOption[i].company_name +
+        thisCompaniesStockData.label = 'Stock Price';
         thisCompaniesStockData.backgroundColor = getRandomColor();
         thisCompaniesStockData.fill = false;
         thisCompaniesStockData.yAxisID = 'stock';
@@ -160,7 +156,7 @@ class App extends React.Component {
   }
 
   compareValues(key, order = 'asc') {
-    return function(a, b) {
+    return function (a, b) {
       if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
         return 0;
       }
@@ -230,7 +226,7 @@ function getRandomColor() {
 
 function getUrlVars() {
   var vars = {};
-  var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+  var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
     vars[key] = value;
   });
   return vars;
@@ -257,7 +253,6 @@ async function retrieveStockInfoForCompany(selectedOption) {
     }
   });
   return selectedOption;
-  //end stock
 }
 
 export default App;

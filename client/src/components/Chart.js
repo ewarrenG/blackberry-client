@@ -37,17 +37,11 @@ class Chart extends Component {
                   id: 'stock',
                   type: 'linear',
                   position: 'right'
-                  // ticks: {
-                  //   max: 1,
-                  //   min: 0
-                  // }
                 }
               ]
-            }
-            /*legend: {
-              display: this.props.displayLegend,
-              position: this.props.legendPosition
-            }*/
+            },
+            maintainAspectRatio: false,
+            responsive: true
           }}
         />
       </div>
